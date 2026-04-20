@@ -30,30 +30,63 @@ public class FileSystemStorageService implements StorageService {
 
     this.rootLocation = Paths.get(properties.getLocation());
   }
-
   @Override
-  public void store(MultipartFile file) {
+  public String store(MultipartFile file) {
     try {
       if (file.isEmpty()) {
         throw new StorageException("Failed to store empty file.");
       }
+
+      // Garder le nom original du fichier
+      String originalFilename = file.getOriginalFilename();
+
       Path destinationFile = this.rootLocation.resolve(
-          Paths.get(file.getOriginalFilename()))
-          .normalize().toAbsolutePath();
+                      Paths.get(originalFilename))
+              .normalize().toAbsolutePath();
+
       if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
         // This is a security check
         throw new StorageException(
-            "Cannot store file outside current directory.");
+                "Cannot store file outside current directory.");
       }
+
       try (InputStream inputStream = file.getInputStream()) {
         Files.copy(inputStream, destinationFile,
-          StandardCopyOption.REPLACE_EXISTING);
+                StandardCopyOption.REPLACE_EXISTING);
       }
-    }
-    catch (IOException e) {
+
+      // ✅ RETOURNER LE NOM DU FICHIER au lieu de null
+      return originalFilename;
+
+    } catch (IOException e) {
       throw new StorageException("Failed to store file.", e);
     }
   }
+//
+//  @Override
+//  public String store(MultipartFile file) {
+//    try {
+//      if (file.isEmpty()) {
+//        throw new StorageException("Failed to store empty file.");
+//      }
+//      Path destinationFile = this.rootLocation.resolve(
+//          Paths.get(file.getOriginalFilename()))
+//          .normalize().toAbsolutePath();
+//      if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+//        // This is a security check
+//        throw new StorageException(
+//            "Cannot store file outside current directory.");
+//      }
+//      try (InputStream inputStream = file.getInputStream()) {
+//        Files.copy(inputStream, destinationFile,
+//          StandardCopyOption.REPLACE_EXISTING);
+//      }
+//    }
+//    catch (IOException e) {
+//      throw new StorageException("Failed to store file.", e);
+//    }
+//    return null;
+//  }
 
   @Override
   public Stream<Path> loadAll() {

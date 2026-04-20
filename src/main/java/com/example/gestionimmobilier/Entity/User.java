@@ -4,6 +4,7 @@ package com.example.gestionimmobilier.Entity;
 import com.example.gestionimmobilier.Enum.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serializable;
@@ -16,15 +17,15 @@ import java.util.Collection;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@SuperBuilder
 
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails, Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nom;
-    private double telephone;
+    private String telephone;
     private String poste;
     private String email;
     private String password;

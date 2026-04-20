@@ -1,6 +1,7 @@
 package com.example.gestionimmobilier.storage;
 
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -10,7 +11,7 @@ public interface StorageService {
 
   void init();
 
-  void store(MultipartFile file);
+  String store(MultipartFile file);
 
   Stream<Path> loadAll();
 
@@ -18,6 +19,8 @@ public interface StorageService {
 
   Resource loadAsResource(String filename);
 
+
+  @Transactional
   void delete(String filename);
 
   void deleteAll();

@@ -15,7 +15,7 @@ public class RegisterRequest {
   private Long id;
   private String nom;
   private String poste;
-  private double telephone;
+  private String telephone;
   private String email;
   private String password;
   private Role role;

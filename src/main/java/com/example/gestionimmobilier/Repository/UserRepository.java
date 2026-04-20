@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndPassword(String email, String password);
-    Optional<User> findByTelephone( double tel);
+    Optional<User> findByTelephone( String tel);
     Optional<User> findByEmail(String email);
 
 //    @Query("SELECT u FROM User u JOIN u.avis a WHERE a.id = :avisId")

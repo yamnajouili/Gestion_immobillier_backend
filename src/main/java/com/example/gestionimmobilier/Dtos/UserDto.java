@@ -11,7 +11,7 @@ public class UserDto {
 
         private Long id;
         private String nom;
-        private double telephone;
+        private String telephone;
         private String poste;
         private String email;
         private String password;
