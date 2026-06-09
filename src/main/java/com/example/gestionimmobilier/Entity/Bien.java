@@ -28,6 +28,10 @@ public class Bien {
     private String adresse;
     private String ville;
     private Boolean disponible;
+
+    @ManyToOne
+    @JoinColumn(name = "proprietaire_id")
+    private Proprietaire proprietaire;
     @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL)
     private List<ImageFile> images;
 }

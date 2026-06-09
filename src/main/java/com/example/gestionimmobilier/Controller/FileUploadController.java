@@ -116,7 +116,7 @@ public class FileUploadController {
 
         // ✔ 3. créer image en DB avec l'URL complète
         ImageFile image = new ImageFile();
-        image.setUlr(fullUrl); // Stocke l'URL complète
+        image.setUrl(fullUrl); // Stocke l'URL complète
         image.setEstPrincipale(i == 0);
         image.setOrdre(i);
         image.setBien(bien);
@@ -168,10 +168,10 @@ public class FileUploadController {
   public ResponseEntity<?> deleteFile(@PathVariable String filename) {
     try {
 
-      String ulr ="http://localhost:8080/uploads/"+ filename;
+      String url ="http://localhost:8080/uploads/"+ filename;
 
       // 🔥 vérifier en base
-      ImageFile image = imageFileRepository.findByUlr(ulr)
+      ImageFile image = imageFileRepository.findByUrl(url)
               .orElseThrow(() -> new RuntimeException("Image non trouvée en BD"));
 
       // 🔥 supprimer fichier

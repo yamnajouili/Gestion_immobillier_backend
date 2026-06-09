@@ -10,7 +10,7 @@ public interface IVisiteService {
 
 
     @Transactional
-    Visite createVisite(VisiteDto visiteDto);
+    VisiteDto createVisite(VisiteDto visiteDto);
 
 
     List<VisiteDto> getAllVisites();

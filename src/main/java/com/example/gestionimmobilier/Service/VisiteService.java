@@ -23,36 +23,78 @@ public class VisiteService implements IVisiteService{
     private final IVisiteMapper iVisiteMapper;
     private final BienRepository bienRepository;
     private final ClientRepository clientRepository;
-    @Override
-    public Visite createVisite(VisiteDto dto) {
-        // Vérifier que le bienId est fourni
-        if (dto.getBienId() == null) {
-            throw new RuntimeException("Le Bien est obligatoire pour créer une visite");
-        }
-
-        // Vérifier que le clientId est fourni (NOUVEAU)
-        if (dto.getClientId() == null) {
-            throw new RuntimeException("Le Client est obligatoire pour créer une visite");
-        }
-
-        Visite visite = new Visite();
-        visite.setDateProposee(dto.getDateProposee());
-        visite.setDateConfirme(dto.getDateConfirme());
-        visite.setStatut(dto.getStatut());
-        visite.setCommentaire(dto.getCommentaire());
-
-        // Récupérer le Bien existant depuis la DB
-        Bien bien = bienRepository.findById(dto.getBienId())
-                .orElseThrow(() -> new RuntimeException("Bien introuvable avec id: " + dto.getBienId()));
-        visite.setBien(bien);
-
-        // Récupérer le Client existant depuis la DB (NOUVEAU)
-        Client client = clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client introuvable avec id: " + dto.getClientId()));
-        visite.setClient(client);  // ← Lien vers le client
-
-        return visiteRepository.save(visite);
+//    @Override
+//    public Visite createVisite(VisiteDto dto) {
+//        // Vérifier que le bienId est fourni
+//        if (dto.getBienId() == null) {
+//            throw new RuntimeException("Le Bien est obligatoire pour créer une visite");
+//        }
+//
+//        // Vérifier que le clientId est fourni (NOUVEAU)
+//        if (dto.getClientId() == null) {
+//            throw new RuntimeException("Le Client est obligatoire pour créer une visite");
+//        }
+//
+//        Visite visite = new Visite();
+//        visite.setDateProposee(dto.getDateProposee());
+//        visite.setDateConfirme(dto.getDateConfirme());
+//        visite.setStatut(dto.getStatut());
+//        visite.setCommentaire(dto.getCommentaire());
+//
+//        // Récupérer le Bien existant depuis la DB
+//        Bien bien = bienRepository.findById(dto.getBienId())
+//                .orElseThrow(() -> new RuntimeException("Bien introuvable avec id: " + dto.getBienId()));
+//        visite.setBien(bien);
+//
+//        // Récupérer le Client existant depuis la DB (NOUVEAU)
+//        Client client = clientRepository.findById(dto.getClientId())
+//                .orElseThrow(() -> new RuntimeException("Client introuvable avec id: " + dto.getClientId()));
+//        visite.setClient(client);  // ← Lien vers le client
+//
+//        return visiteRepository.save(visite);
+//    }
+@Override
+public VisiteDto createVisite(VisiteDto dto) {
+    // Vérifier que le bienId est fourni
+    if (dto.getBienId() == null) {
+        throw new RuntimeException("Le Bien est obligatoire pour créer une visite");
     }
+
+    // Vérifier que le clientId est fourni (NOUVEAU)
+    if (dto.getClientId() == null) {
+        throw new RuntimeException("Le Client est obligatoire pour créer une visite");
+    }
+
+    Visite visite = new Visite();
+    visite.setDateProposee(dto.getDateProposee());
+    visite.setDateConfirme(dto.getDateConfirme());
+    visite.setStatut(dto.getStatut());
+    visite.setCommentaire(dto.getCommentaire());
+
+    // Récupérer le Bien existant depuis la DB
+    Bien bien = bienRepository.findById(dto.getBienId())
+            .orElseThrow(() -> new RuntimeException("Bien introuvable avec id: " + dto.getBienId()));
+    visite.setBien(bien);
+
+    // Récupérer le Client existant depuis la DB (NOUVEAU)
+    Client client = clientRepository.findById(dto.getClientId())
+            .orElseThrow(() -> new RuntimeException("Client introuvable avec id: " + dto.getClientId()));
+    visite.setClient(client);  // ← Lien vers le client
+
+    Visite savedVisite = visiteRepository.save(visite);
+
+    // Convertir l'entité sauvegardée en DTO
+    VisiteDto responseDto = new VisiteDto();
+    responseDto.setId(savedVisite.getId());
+    responseDto.setDateProposee(savedVisite.getDateProposee());
+    responseDto.setDateConfirme(savedVisite.getDateConfirme());
+    responseDto.setStatut(savedVisite.getStatut());
+    responseDto.setCommentaire(savedVisite.getCommentaire());
+    responseDto.setBienId(savedVisite.getBien().getId());
+    responseDto.setClientId(savedVisite.getClient().getId());
+
+    return responseDto;
+}
     @Override
     public List<VisiteDto> getAllVisites() {
         return  visiteRepository.findAll().stream().map(

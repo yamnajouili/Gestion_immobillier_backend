@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Contrats", description = "CRUD Contrats")
@@ -23,40 +24,76 @@ public class ContratController {
 
 
     private final IContratService iContratService;
-
+    // ✅ CREATE + envoi email
     @PostMapping("/add")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Créer un nouvel Contrat")
-    public Contrat createContrat(@RequestBody ContratDto request) {
-        return iContratService.createContrat(request);
+    @Operation(summary = "Créer un contrat et envoyer email au client")
+    public ResponseEntity<Contrat> createContrat(@RequestBody ContratDto request) throws Exception {
+        Contrat contrat = iContratService.createContrat(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contrat);
     }
 
-    @GetMapping("/read")
-    @Operation(summary = "Lister tous les Contrats")
-    public List<ContratDto> getAllContrats() {
-        return iContratService.getAllContrats();
+    // ✅ READ ALL
+    @GetMapping
+    @Operation(summary = "Lister tous les contrats")
+    public ResponseEntity<List<ContratDto>> getAllContrats() {
+        return ResponseEntity.ok(iContratService.getAllContrats());
     }
 
+    // ✅ READ BY ID
     @GetMapping("/{id}")
-    @Operation(summary = "Obtenir un contrat par son ID")
+    @Operation(summary = "Obtenir un contrat par ID")
     public ResponseEntity<ContratDto> getContratById(@PathVariable Long id) {
         return ResponseEntity.ok(iContratService.getContratById(id));
     }
 
-    @PutMapping("/update")
+    // ✅ UPDATE
+    @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour un contrat")
-    public ResponseEntity<Contrat> updateContrat(@RequestBody ContratDto contratDto) {
+    public ResponseEntity<Contrat> updateContrat(
+            @PathVariable Long id,
+            @RequestBody ContratDto contratDto) {
+
+        contratDto.setId(id);
         return ResponseEntity.ok(iContratService.updateContrat(contratDto));
     }
 
-    @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    // ✅ DELETE
+    @DeleteMapping("/{id}")
     @Operation(summary = "Supprimer un contrat")
-    public void deleteContrat(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteContrat(@PathVariable Long id) {
         iContratService.deleteContrat(id);
+        return ResponseEntity.noContent().build();
     }
 
+    // 🔥 NOUVEAU : récupérer contrat via token (pour front Angular)
+    @GetMapping("/token/{id}")
+    @Operation(summary = "Récupérer un contrat via token")
+    public ResponseEntity<ContratDto> getByToken(@PathVariable String id) {
+        return ResponseEntity.ok(iContratService.getContratByToken(id));
+    }
 
+    // 🔥 NOUVEAU : signer contrat
+    @PostMapping("/sign/{id}")
+    @Operation(summary = "Signer un contrat via token")
+    public ResponseEntity<?> signerContrat(@PathVariable String id) {
+        try {
+            iContratService.signerContrat(id);
+
+            // ✔ retourner JSON
+            return ResponseEntity.ok().body(Map.of(
+                    "message", "Contrat signé avec succès"
+            ));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "error", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "error", "Erreur serveur"
+            ));
+        }
+    }
 
 
 

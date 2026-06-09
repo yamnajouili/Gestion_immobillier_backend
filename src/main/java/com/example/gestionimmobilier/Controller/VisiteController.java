@@ -24,7 +24,7 @@ public class VisiteController {
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Créer un nouvel Visite")
-    public Visite createVisite(@RequestBody VisiteDto request) {
+    public VisiteDto createVisite(@RequestBody VisiteDto request) {  // ← Changé Visite → VisiteDto
         return iVisiteService.createVisite(request);
     }
 

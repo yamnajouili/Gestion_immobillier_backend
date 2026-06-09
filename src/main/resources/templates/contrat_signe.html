@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:0; }
+        .container { max-width:600px; margin:30px auto; background:#fff; border-radius:8px; padding:30px; }
+        .header { background:#27ae60; color:#fff; padding:20px; border-radius:8px 8px 0 0; text-align:center; }
+        .content { padding:20px 0; color:#333; }
+        .detail { background:#f8f9fa; border-radius:6px; padding:16px; margin:16px 0; }
+        .detail p { margin:6px 0; font-size:14px; }
+        .footer { font-size:12px; color:#999; text-align:center; margin-top:20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Contrat signé ✓</h2>
+    </div>
+    <div class="content">
+        <p>Bonjour <strong th:text="${proprietaireNom}">Propriétaire</strong>,</p>
+        <p>Votre client a signé le contrat de location.</p>
+        <div class="detail">
+            <p><strong>Client :</strong> <span th:text="${clientNom}"></span></p>
+            <p><strong>Bien :</strong> <span th:text="${bienTitre}"></span></p>
+            <p><strong>Loyer mensuel :</strong> <span th:text="${montantLoyer}"></span> TND</p>
+            <p><strong>Date début :</strong> <span th:text="${dateDebut}"></span></p>
+            <p><strong>Date fin :</strong> <span th:text="${dateFin}"></span></p>
+        </div>
+        <p>Consultez votre dashboard pour plus de détails.</p>
+    </div>
+    <div class="footer">
+        <p>Gestion Immobilier — Ne pas répondre à cet email</p>
+    </div>
+</div>
+</body>
+</html>

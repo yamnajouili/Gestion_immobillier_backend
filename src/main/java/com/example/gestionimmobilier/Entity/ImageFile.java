@@ -17,7 +17,7 @@ public class ImageFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
-    private String ulr;
+    private String url;
     private Boolean estPrincipale;
     private Integer ordre;
     @ManyToOne

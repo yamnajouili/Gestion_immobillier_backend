@@ -11,7 +11,7 @@ import java.util.List;
 public interface IContratService {
 
     @Transactional
-    Contrat createContrat(ContratDto contratDto);
+    Contrat createContrat(ContratDto contratDto) throws Exception;
 
 
     List<ContratDto> getAllContrats();
@@ -19,7 +19,9 @@ public interface IContratService {
     ContratDto getContratById(Long id);
 
 
+    ContratDto getContratByToken(String token);
 
+    void signerContrat(String token) throws Exception;
 
     @Transactional
     Contrat updateContrat(ContratDto contratDto);

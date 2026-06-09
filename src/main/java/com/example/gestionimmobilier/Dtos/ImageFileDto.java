@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ImageFileDto {
-    private String ulr;
+    private String url;
     private Boolean estPrincipale;
     private Integer ordre;
 }
