@@ -7,12 +7,14 @@ import com.example.gestionimmobilier.Entity.Token;
 import com.example.gestionimmobilier.Entity.User;
 import com.example.gestionimmobilier.Enum.Role;
 import com.example.gestionimmobilier.Enum.TokenType;
+import com.example.gestionimmobilier.Mapper.IProprietaireMapper;
 import com.example.gestionimmobilier.Repository.ClientRepository;
 import com.example.gestionimmobilier.Repository.ProprietaireRepository;
 import com.example.gestionimmobilier.Repository.TokenRepository;
 import com.example.gestionimmobilier.Security.JwtService;
 import com.example.gestionimmobilier.auth.AuthenticationResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,8 @@ public class ProprietaireService implements IProprietaireService{
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
+    private final IProprietaireMapper iProprietaireMapper;
+
 
     @Override
     public List<Proprietaire> getAllProprietaires() {
@@ -70,7 +74,59 @@ public class ProprietaireService implements IProprietaireService{
                 .build();
     }
 
+    @Override
+    public ProprietaireDto updateProfile(ProprietaireDto proprietaireDto) {
 
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Proprietaire proprietaire =
+                proprietaireRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Propriétaire non trouvé"
+                                )
+                        );
+
+        // Informations communes
+        proprietaire.setNom(
+                proprietaireDto.getNom()
+        );
+
+        proprietaire.setTelephone(
+                proprietaireDto.getTelephone()
+        );
+
+        proprietaire.setPoste(
+                proprietaireDto.getPoste()
+        );
+
+        // Informations propriétaire
+        proprietaire.setTypeProprietaire(
+                proprietaireDto.getTypeProprietaire()
+        );
+
+        proprietaire.setAdresseProfessionnelle(
+                proprietaireDto.getAdresseProfessionnelle()
+        );
+
+        proprietaire.setNumeroSiret(
+                proprietaireDto.getNumeroSiret()
+        );
+
+        proprietaire.setNomAgence(
+                proprietaireDto.getNomAgence()
+        );
+
+        Proprietaire savedProprietaire =
+                proprietaireRepository.save(proprietaire);
+
+        return iProprietaireMapper.fromProprietaire(
+                savedProprietaire
+        );
+    }
 
 
     private void saveUserToken(User user, String jwtToken) {
@@ -84,7 +140,16 @@ public class ProprietaireService implements IProprietaireService{
         tokenRepository.save(token);
     }
 
+    @Override
+    public ProprietaireDto getProprietaireById(Long id) {
 
+        Proprietaire proprietaire = proprietaireRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Propriétaire non trouvé avec id : " + id)
+                );
+
+        return iProprietaireMapper.fromProprietaire(proprietaire);
+    }
 
     @Override
     public void deleteProprietaire(Long id) {

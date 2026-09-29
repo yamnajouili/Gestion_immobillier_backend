@@ -125,4 +125,35 @@ public class FavorisService implements IFavorisService {
         // Supprimer le favoris
         favorisRepository.deleteById(favoris.getId());
     }
+
+
+
+
+
+
+    @Override
+    public List<FavorisDto> getMesFavoris() {
+
+        // 1. Récupérer l'email du client connecté
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        // 2. Récupérer le client
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        // 3. Récupérer uniquement ses favoris
+        List<Favoris> favoris = favorisRepository.findByClientId(client.getId());
+
+        // 4. Convertir en DTO
+        return favoris.stream()
+                .map(iFavorisMapper::fromFavoris)
+                .collect(Collectors.toList());
+    }
+
+
+
+
 }

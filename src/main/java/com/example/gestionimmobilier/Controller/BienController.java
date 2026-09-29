@@ -4,6 +4,7 @@ package com.example.gestionimmobilier.Controller;
 import com.example.gestionimmobilier.Dtos.BienDto;
 import com.example.gestionimmobilier.Entity.Bien;
 import com.example.gestionimmobilier.Entity.ImageFile;
+import com.example.gestionimmobilier.Mapper.IBienMapper;
 import com.example.gestionimmobilier.Repository.BienRepository;
 import com.example.gestionimmobilier.Repository.ImageFileRepository;
 import com.example.gestionimmobilier.Service.IBienService;
@@ -30,7 +31,7 @@ public class BienController {
 
 
     private final IBienService iBienService;
-
+    private final IBienMapper iBienMapper;
     @PostMapping(value = "/add-with-images",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,10 +71,14 @@ public class BienController {
 
     @PutMapping("/update")
     @Operation(summary = "Mettre à jour un bien")
-    public ResponseEntity<Bien> updateBien(@RequestBody BienDto bienDto) {
-        return ResponseEntity.ok(iBienService.updateBien(bienDto));
-    }
+    public ResponseEntity<BienDto> updateBien(@RequestBody BienDto bienDto) {
 
+        Bien bien = iBienService.updateBien(bienDto);
+
+        BienDto response = iBienMapper.fromBien(bien);
+
+        return ResponseEntity.ok(response);
+    }
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Supprimer un bien")

@@ -28,4 +28,8 @@ public interface IContratService {
 
     @Transactional
     void deleteContrat(Long id);
+
+    List<ContratDto> getMesContrats();
+
+    List<ContratDto> getMesContratsProprietaire();
 }

@@ -24,11 +24,11 @@ public class Recommandation {
     private Date dateGeneration;
     private String motifs;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "bien_recommandation_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "bien_recommandation_id")
     private Bien bien;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "preference_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "preference_id")
     private PreferenceUtilisateur preferenceUtilisateur;
 }

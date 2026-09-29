@@ -55,13 +55,20 @@ public class FavorisController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Supprimer un favoris")
     public void deleteFavoris(@PathVariable Long id) {
-        iFavorisService.deleteFavoris(id);
-    }
+        iFavorisService.deleteFavoris(id);}
     @DeleteMapping("/delete-by-bien")
     public ResponseEntity<Void> deleteFavorisByBienId(@RequestBody Map<String, Long> request) {
         Long bienId = request.get("bienId");
         iFavorisService.deleteFavorisByBienId(bienId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/mes-favoris")
+    @Operation(summary = "Obtenir les favoris du client connecté")
+    public ResponseEntity<List<FavorisDto>> getMesFavoris() {
+        return ResponseEntity.ok(
+                iFavorisService.getMesFavoris()
+        );
     }
 
 }

@@ -1,13 +1,17 @@
 package com.example.gestionimmobilier.Controller;
 
 
+import com.example.gestionimmobilier.Dtos.ChangePasswordRequest;
 import com.example.gestionimmobilier.Dtos.UserDto;
 import com.example.gestionimmobilier.Service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Users", description = "CRUD Users")
@@ -19,9 +23,29 @@ public class UserController {
     private final IUserService iUserService;
 
 
+
     @GetMapping("/current-user")
     public UserDto getCurrentUser() {
         return iUserService.getLoggedInUser();
     }
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            Principal connectedUser
+    ) {
 
+        iUserService.changePassword(
+                request,
+                connectedUser
+        );
+
+        Map<String, String> response = new HashMap<>();
+
+        response.put(
+                "message",
+                "Mot de passe modifié avec succès"
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }

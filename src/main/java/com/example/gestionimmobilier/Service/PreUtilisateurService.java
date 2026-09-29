@@ -3,12 +3,15 @@ package com.example.gestionimmobilier.Service;
 import com.example.gestionimmobilier.Dtos.BienDto;
 import com.example.gestionimmobilier.Dtos.PreferenceUtilisateurDto;
 import com.example.gestionimmobilier.Entity.Bien;
+import com.example.gestionimmobilier.Entity.Client;
 import com.example.gestionimmobilier.Entity.PreferenceUtilisateur;
 import com.example.gestionimmobilier.Mapper.IBienMapper;
 import com.example.gestionimmobilier.Mapper.IPreUtilisateurMapper;
 import com.example.gestionimmobilier.Repository.BienRepository;
+import com.example.gestionimmobilier.Repository.ClientRepository;
 import com.example.gestionimmobilier.Repository.PrefUtilisateurRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,12 +23,44 @@ public class PreUtilisateurService implements IPreUtilisateurService{
 
     private final PrefUtilisateurRepository prefUtilisateurRepository;
     private final IPreUtilisateurMapper iPreUtilisateurMapper;
+    private final ClientRepository clientRepository;
+//    @Override
+//    public PreferenceUtilisateur createPreUtilisateur(PreferenceUtilisateurDto preferenceUtilisateurDto) {
+//
+//        PreferenceUtilisateur preferenceUtilisateur = iPreUtilisateurMapper.fromPreUtilisateurDTO(preferenceUtilisateurDto);
+//
+//        return prefUtilisateurRepository.save(preferenceUtilisateur);
+//    }
+
+
     @Override
-    public PreferenceUtilisateur createPreUtilisateur(PreferenceUtilisateurDto preferenceUtilisateurDto) {
+    public PreferenceUtilisateur createPreUtilisateur(
+            PreferenceUtilisateurDto preferenceUtilisateurDto) {
 
-        PreferenceUtilisateur preferenceUtilisateur = iPreUtilisateurMapper.fromPreUtilisateurDTO(preferenceUtilisateurDto);
+        // 🔐 Récupérer l'email du client connecté
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        return prefUtilisateurRepository.save(preferenceUtilisateur);
+        // 👤 Récupérer le client
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Client introuvable"));
+
+        // 📝 Créer la préférence
+        PreferenceUtilisateur preferenceUtilisateur =
+                iPreUtilisateurMapper.fromPreUtilisateurDTO(
+                        preferenceUtilisateurDto
+                );
+
+        // 🔗 Associer la préférence au client
+        client.setPreference(preferenceUtilisateur);
+
+        // 💾 Sauvegarder le client
+        clientRepository.save(client);
+
+        return preferenceUtilisateur;
     }
 
     @Override

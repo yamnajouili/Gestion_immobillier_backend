@@ -8,6 +8,7 @@ import com.example.gestionimmobilier.Entity.Token;
 import com.example.gestionimmobilier.Entity.User;
 import com.example.gestionimmobilier.Enum.Role;
 import com.example.gestionimmobilier.Enum.TokenType;
+import com.example.gestionimmobilier.Mapper.IClientMapper;
 import com.example.gestionimmobilier.Repository.ClientRepository;
 import com.example.gestionimmobilier.Repository.FavorisRepository;
 import com.example.gestionimmobilier.Repository.TokenRepository;
@@ -29,6 +30,7 @@ public class ClientService implements IClientService{
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final FavorisRepository favorisRepository;
+    private final IClientMapper iClientMapper;
     @Override
     public List<Client> getAllClients() {
         return clientRepository.findAll();
@@ -62,7 +64,27 @@ public class ClientService implements IClientService{
                 .build();
     }
 
+    @Override
+    public ClientDto updateProfile(ClientDto clientDto) {
 
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Client non trouvé")
+                );
+
+        client.setNom(clientDto.getNom());
+        client.setTelephone(clientDto.getTelephone());
+        client.setPoste(clientDto.getPoste());
+
+        Client savedClient = clientRepository.save(client);
+
+        return iClientMapper.fromClient(savedClient);
+    }
 
 
     private void saveUserToken(User user, String jwtToken) {

@@ -16,4 +16,6 @@ public interface ContratRepository extends JpaRepository<Contrat,Long> {
 
     // Pour lister les contrats d'un client
     List<Contrat> findByClientId(Long clientId);
+    List<Contrat> findByClientEmail(String email);
+    List<Contrat> findByProprietaireEmail(String email);
 }

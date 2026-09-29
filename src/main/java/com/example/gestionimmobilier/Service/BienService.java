@@ -133,7 +133,21 @@ public class BienService implements IBienService{
 
     @Override
     public Bien updateBien(BienDto bienDto) {
-        Bien bien = iBienMapper.fromBienDTO(bienDto);
+
+        Bien bien = bienRepository.findById(bienDto.getId())
+                .orElseThrow(() ->
+                        new RuntimeException("Bien non trouvé avec id : " + bienDto.getId())
+                );
+
+        bien.setTitre(bienDto.getTitre());
+        bien.setDescription(bienDto.getDescription());
+        bien.setPrix(bienDto.getPrix());
+        bien.setSurface(bienDto.getSurface());
+        bien.setType(bienDto.getType());
+        bien.setAdresse(bienDto.getAdresse());
+        bien.setVille(bienDto.getVille());
+        bien.setDisponible(bienDto.getDisponible());
+
         return bienRepository.save(bien);
     }
 

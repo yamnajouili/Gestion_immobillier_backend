@@ -24,7 +24,8 @@ public class PreUtilisateurController {
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Créer un nouvel preUtilisateur")
-    public PreferenceUtilisateur createPreUtilisateur(@RequestBody PreferenceUtilisateurDto request) {
+    public PreferenceUtilisateur createPreUtilisateur(@RequestBody PreferenceUtilisateurDto request)
+    {
         return iPreUtilisateurService.createPreUtilisateur(request);
     }
 

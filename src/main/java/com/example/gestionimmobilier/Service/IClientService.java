@@ -21,7 +21,7 @@ public interface IClientService {
 
     AuthenticationResponse register(ClientDto request);
 
-
+    ClientDto updateProfile(ClientDto clientDto);
     void deleteClient(Long id);
 
 

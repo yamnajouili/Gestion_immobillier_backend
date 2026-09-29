@@ -229,4 +229,36 @@ public class ContratService implements IContratService {
         }
         contratRepository.deleteById(id);
     }
+
+    @Override
+    public List<ContratDto> getMesContrats() {
+
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        List<Contrat> contrats = contratRepository.findByClientEmail(email);
+
+        return contrats.stream()
+                .map(iContratMapper::fromContrat)
+                .toList();
+    }
+
+
+    @Override
+    public List<ContratDto> getMesContratsProprietaire() {
+
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        List<Contrat> contrats =
+                contratRepository.findByProprietaireEmail(email);
+
+        return contrats.stream()
+                .map(iContratMapper::fromContrat)
+                .toList();
+    }
 }

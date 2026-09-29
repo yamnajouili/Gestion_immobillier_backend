@@ -31,5 +31,12 @@ public class ClientController {
         return ResponseEntity.ok(iClientService.getAllClients());
     }
 
-
+    @PutMapping("/profile")
+    public ResponseEntity<ClientDto> updateProfile(
+            @RequestBody ClientDto clientDto
+    ) {
+        return ResponseEntity.ok(
+                iClientService.updateProfile(clientDto)
+        );
+    }
 }

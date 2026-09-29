@@ -96,5 +96,23 @@ public class ContratController {
     }
 
 
+    @GetMapping("/mes-contrats")
+    @Operation(summary = "Obtenir les contrats du client connecté")
+    public ResponseEntity<List<ContratDto>> getMesContrats() {
+
+        return ResponseEntity.ok(
+                iContratService.getMesContrats()
+        );
+    }
+
+    @GetMapping("/mes-contrats-proprietaire")
+    @Operation(summary = "Obtenir les contrats du propriétaire connecté")
+    public ResponseEntity<List<ContratDto>> getMesContratsProprietaire() {
+
+        return ResponseEntity.ok(
+                iContratService.getMesContratsProprietaire()
+        );
+    }
+
 
 }

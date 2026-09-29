@@ -93,32 +93,46 @@ public class FileUploadController {
   // ✅ POST: Upload plusieurs fichiers
 
 
-
-
   @PostMapping(value = "/upload/multiple/{bienId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<?> uploadImages(
           @PathVariable Long bienId,
           @RequestPart("files") MultipartFile[] files) {
 
     Bien bien = bienRepository.findById(bienId)
-            .orElseThrow(() -> new RuntimeException("Bien introuvable"));
+            .orElseThrow(() ->
+                    new RuntimeException("Bien introuvable")
+            );
+
+    // Nombre d'images déjà existantes
+    int nombreImagesExistantes = bien.getImages() != null
+            ? bien.getImages().size()
+            : 0;
 
     for (int i = 0; i < files.length; i++) {
+
       MultipartFile file = files[i];
 
       if (!file.isEmpty()) {
-        // ✔ 1. stocker fichier et récupérer le nom généré
+
+        // Stocker le fichier
         String storedFileName = storageService.store(file);
 
-        // ✔ 2. Construire l'URL complète
-        String baseUrl = "http://localhost:8080/uploads/"; // À adapter selon votre configuration
+        // Construire l'URL
+        String baseUrl = "http://localhost:8081/uploads/";
         String fullUrl = baseUrl + storedFileName;
 
-        // ✔ 3. créer image en DB avec l'URL complète
+        // Enregistrer l'image
         ImageFile image = new ImageFile();
-        image.setUrl(fullUrl); // Stocke l'URL complète
-        image.setEstPrincipale(i == 0);
-        image.setOrdre(i);
+        image.setUrl(fullUrl);
+
+        // Principale seulement si aucune image n'existe
+        image.setEstPrincipale(
+                nombreImagesExistantes == 0 && i == 0
+        );
+
+        // Continuer l'ordre
+        image.setOrdre(nombreImagesExistantes + i);
+
         image.setBien(bien);
 
         imageFileRepository.save(image);
@@ -137,17 +151,19 @@ public class FileUploadController {
 //            .orElseThrow(() -> new RuntimeException("Bien introuvable"));
 //
 //    for (int i = 0; i < files.length; i++) {
-//
 //      MultipartFile file = files[i];
 //
 //      if (!file.isEmpty()) {
+//        // ✔ 1. stocker fichier et récupérer le nom généré
+//        String storedFileName = storageService.store(file);
 //
-//        // ✔ 1. stocker fichier
-//        storageService.store(file);
+//        // ✔ 2. Construire l'URL complète
+//        String baseUrl = "http://localhost:8080/uploads/"; // À adapter selon votre configuration
+//        String fullUrl = baseUrl + storedFileName;
 //
-//        // ✔ 2. créer image en DB
+//        // ✔ 3. créer image en DB avec l'URL complète
 //        ImageFile image = new ImageFile();
-//        image.setUlr(file.getOriginalFilename());
+//        image.setUrl(fullUrl); // Stocke l'URL complète
 //        image.setEstPrincipale(i == 0);
 //        image.setOrdre(i);
 //        image.setBien(bien);
@@ -160,6 +176,31 @@ public class FileUploadController {
 //  }
 
 
+
+  @DeleteMapping("/images/{id}")
+  public ResponseEntity<?> deleteImage(@PathVariable Long id) {
+
+    try {
+      ImageFile image = imageFileRepository.findById(id)
+              .orElseThrow(() ->
+                      new RuntimeException("Image non trouvée en BD")
+              );
+
+      String filename = image.getUrl()
+              .substring(image.getUrl().lastIndexOf("/") + 1);
+
+      storageService.delete(filename);
+
+      imageFileRepository.delete(image);
+
+      return ResponseEntity.ok("Image supprimée avec succès");
+
+    } catch (Exception e) {
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(e.getMessage());
+    }
+  }
 
 
 
@@ -193,4 +234,61 @@ public class FileUploadController {
   public ResponseEntity<?> handleStorageFileNotFound() {
     return ResponseEntity.notFound().build();
   }
+
+
+
+
+
+  @PostMapping(value = "/chat/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<?> uploadChatFiles(@RequestPart("files") MultipartFile[] files) {
+
+    try {
+      var result = new java.util.ArrayList<Map<String, String>>();
+
+      for (MultipartFile file : files) {
+
+        if (file.isEmpty()) {
+          continue;
+        }
+
+        // Accepter seulement image ou vidéo
+        String contentType = file.getContentType();
+
+        if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
+
+          continue;
+        }
+
+        // Stockage avec ton StorageService existant
+        String storedFileName = storageService.store(file);
+
+        String fullUrl =
+                "http://localhost:8081/uploads/" + storedFileName;
+
+        String type = contentType.startsWith("image/")
+                ? "IMAGE"
+                : "VIDEO";
+
+        Map<String, String> fileInfo = new HashMap<>();
+
+        fileInfo.put("url", fullUrl);
+        fileInfo.put("type", type);
+        fileInfo.put("fileName", file.getOriginalFilename() != null ? file.getOriginalFilename()
+                        : storedFileName
+        );
+
+        result.add(fileInfo);
+      }
+
+      return ResponseEntity.ok(result);
+
+    } catch (Exception e) {
+
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body("Erreur upload chat : " + e.getMessage());
+    }
+  }
+
+
 }

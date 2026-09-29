@@ -24,6 +24,7 @@ public interface IFavorisService {
 
     @Transactional
     void deleteFavorisByBienId(Long bienId);
-
+    @Transactional
+    List <FavorisDto> getMesFavoris();
 
 }

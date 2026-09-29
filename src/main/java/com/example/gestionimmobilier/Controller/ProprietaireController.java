@@ -9,10 +9,7 @@ import com.example.gestionimmobilier.auth.AuthenticationResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Proprietaire", description = "CRUD Proprietaire")
@@ -25,5 +22,25 @@ public class ProprietaireController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody ProprietaireDto request) {
         return ResponseEntity.ok(iProprietaireService.register(request));
+    }
+
+
+    @PutMapping("/profile")
+    public ResponseEntity<ProprietaireDto> updateProfile(
+            @RequestBody ProprietaireDto proprietaireDto
+    ) {
+        return ResponseEntity.ok(
+                iProprietaireService.updateProfile(proprietaireDto)
+        );
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProprietaireDto> getProprietaireById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                iProprietaireService.getProprietaireById(id)
+        );
     }
 }

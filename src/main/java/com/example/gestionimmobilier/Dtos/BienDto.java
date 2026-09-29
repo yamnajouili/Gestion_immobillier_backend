@@ -1,6 +1,4 @@
 package com.example.gestionimmobilier.Dtos;
-
-import com.example.gestionimmobilier.Entity.ImageFile;
 import com.example.gestionimmobilier.Enum.TypeBien;
 import lombok.Data;
 
@@ -19,5 +17,6 @@ public class BienDto {
     private String ville;
     private Boolean disponible;
     private List<ImageFileDto> images;
+    private ProprietaireDto proprietaire;
 
 }

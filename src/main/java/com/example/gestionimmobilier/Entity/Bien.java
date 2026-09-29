@@ -1,6 +1,7 @@
 package com.example.gestionimmobilier.Entity;
 
 import com.example.gestionimmobilier.Enum.TypeBien;
+import com.example.gestionimmobilier.Enum.TypeTransaction;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,7 +29,7 @@ public class Bien {
     private String adresse;
     private String ville;
     private Boolean disponible;
-
+    private TypeTransaction typeTransaction;
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
     private Proprietaire proprietaire;
