@@ -1,5 +1,6 @@
 package com.example.gestionimmobilier.Controller;
 
+import com.example.gestionimmobilier.Dtos.AdminDto;
 import com.example.gestionimmobilier.Entity.Admin;
 import com.example.gestionimmobilier.Service.IAdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,6 +52,15 @@ public class AdminController {
         }
         adminService.deleteAdmin(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<AdminDto> updateProfile(
+            @RequestBody AdminDto adminDto) {
+
+        return ResponseEntity.ok(
+                adminService.updateProfile(adminDto)
+        );
     }
 
 }

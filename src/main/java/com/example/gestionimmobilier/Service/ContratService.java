@@ -36,66 +36,118 @@ public class ContratService implements IContratService {
     private final EmailService emailService;
 
     @Override
-    public Contrat createContrat(ContratDto contratDto) {
+    public ContratDto createContrat(ContratDto contratDto) {
 
         // 1. Récupérer le bien
         Bien bien = bienRepository.findById(contratDto.getBienId())
-                .orElseThrow(() -> new RuntimeException("Bien non trouvé avec id: " + contratDto.getBienId()));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Bien non trouvé avec id: " + contratDto.getBienId()
+                        )
+                );
 
-        // 2. Récupérer ou créer le client par EMAIL
+        // 2. Récupérer ou créer le client
         Client client = clientRepository.findByEmail(contratDto.getClientEmail())
                 .orElseGet(() -> {
+
                     Client nouveauClient = new Client();
+
                     nouveauClient.setEmail(contratDto.getClientEmail());
                     nouveauClient.setNom("À compléter");
-                    log.info("Nouveau client créé avec email: {}", contratDto.getClientEmail());
+
+                    log.info(
+                            "Nouveau client créé avec email: {}",
+                            contratDto.getClientEmail()
+                    );
+
                     return clientRepository.save(nouveauClient);
                 });
 
-        // 3. Récupérer le propriétaire connecté (depuis le token)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 3. Propriétaire connecté
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
         String email = authentication.getName();
 
-        Proprietaire proprietaire = proprietaireRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Propriétaire non trouvé avec email: " + email));
+        Proprietaire proprietaire =
+                proprietaireRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Propriétaire non trouvé avec email: " + email
+                                )
+                        );
 
-        // 4. Construire le contrat
+
+        // 4. Construire contrat
         Contrat contrat = new Contrat();
+
         contrat.setTitre(contratDto.getTitre());
         contrat.setDateDebut(contratDto.getDateDebut());
         contrat.setDateFin(contratDto.getDateFin());
         contrat.setMontantLoyer(contratDto.getMontantLoyer());
         contrat.setCaution(contratDto.getCaution());
+
         contrat.setStatut(StatutContrat.EN_ATTENTE);
+
         contrat.setBien(bien);
         contrat.setClient(client);
-        contrat.setProprietaire(proprietaire);  // ✅ Propriétaire connecté automatiquement
+        contrat.setProprietaire(proprietaire);
 
-        // 5. Générer token de signature
+
+        // 5. Token signature
         String token = UUID.randomUUID().toString();
+
         contrat.setTokenSignature(token);
-        contrat.setTokenExpiration(LocalDateTime.now().plusHours(48));
+        contrat.setTokenExpiration(
+                LocalDateTime.now().plusHours(48)
+        );
+
 
         // 6. Sauvegarder
-        Contrat savedContrat = contratRepository.save(contrat);
-        log.info("Contrat sauvegardé avec id: {}", savedContrat.getId());
+        Contrat savedContrat =
+                contratRepository.save(contrat);
 
-        // 7. Envoyer email de signature
-        String lien = "http://localhost:4200/contrat/signer/" + token;
+        log.info(
+                "Contrat sauvegardé avec id: {}",
+                savedContrat.getId()
+        );
 
+
+        // 7. Lien signature
+        String lien =
+                "http://localhost:4200/contrat/signer/" + token;
+
+
+        // 8. Email
         try {
+
             emailService.envoyerLienSignature(
                     client.getEmail(),
-                    client.getNom() != null ? client.getNom() : "Client",
+                    client.getNom() != null
+                            ? client.getNom()
+                            : "Client",
                     savedContrat,
                     lien
             );
-            log.info("Email envoyé avec succès à: {}", client.getEmail());
+
+            log.info(
+                    "Email envoyé avec succès à: {}",
+                    client.getEmail()
+            );
+
         } catch (Exception e) {
-            log.error("Erreur lors de l'envoi de l'email: {}", e.getMessage());
+
+            log.error(
+                    "Erreur lors de l'envoi de l'email: {}",
+                    e.getMessage()
+            );
         }
 
-        return savedContrat;
+
+        // IMPORTANT :
+        // Entity -> DTO avant de retourner vers Angular
+        return iContratMapper.fromContrat(savedContrat);
     }
 
 
@@ -182,8 +234,10 @@ public class ContratService implements IContratService {
         return iContratMapper.fromContrat(contrat);
     }
 
+
     @Override
     public void signerContrat(String id) throws Exception {
+
         // 1. Vérifier le token
         Contrat contrat = contratRepository.findByTokenSignature(id)
                 .orElseThrow(() -> new RuntimeException("Lien invalide"));
@@ -193,20 +247,37 @@ public class ContratService implements IContratService {
             throw new RuntimeException("Lien expiré");
         }
 
-        // 3. Mettre à jour statut
+        // 3. Modifier le statut du contrat
         contrat.setStatut(StatutContrat.EN_COURS);
         contratRepository.save(contrat);
 
-        // 4. Notifier le propriétaire
-        emailService.envoyerConfirmationSignature(
-                contrat.getProprietaire().getEmail(),
-                contrat.getProprietaire().getNom(),
-                contrat
+        // 4. Rendre le bien indisponible
+        Bien bien = contrat.getBien();
+
+        bien.setDisponible(false);
+
+        bienRepository.save(bien);
+
+        // 5. Notifier le propriétaire
+        try {
+            emailService.envoyerConfirmationSignature(
+                    contrat.getProprietaire().getEmail(),
+                    contrat.getProprietaire().getNom(),
+                    contrat
+            );
+        } catch (Exception e) {
+            log.error(
+                    "Contrat signé mais erreur lors de l'envoi de l'email : {}",
+                    e.getMessage()
+            );
+        }
+
+        log.info(
+                "Contrat signé par {} - Bien {} devenu indisponible",
+                contrat.getClient().getEmail(),
+                bien.getId()
         );
-
-        log.info("Contrat signé par {}", contrat.getClient().getEmail());
     }
-
     @Override
     public Contrat updateContrat(ContratDto contratDto) {
         Contrat contrat = contratRepository.findById(contratDto.getId())

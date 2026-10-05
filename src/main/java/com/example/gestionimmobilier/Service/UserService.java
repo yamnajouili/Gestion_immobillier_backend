@@ -88,4 +88,19 @@ public class UserService implements IUserService {
         // Enregistrer
         userRepository.save(user);
     }
+
+
+
+    @Override
+    public void deleteUser(Long id) {
+
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException(
+                    "Utilisateur non trouvé"
+            );
+        }
+
+        userRepository.deleteById(id);
+    }
+
 }

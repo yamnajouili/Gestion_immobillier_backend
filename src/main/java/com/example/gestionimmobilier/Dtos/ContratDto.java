@@ -19,4 +19,5 @@ public class ContratDto {
     private Long bienId;
     private String clientEmail;
     private Long proprietaireId;
+    private String nomProprietaire;
 }

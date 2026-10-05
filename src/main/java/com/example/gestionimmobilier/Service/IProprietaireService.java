@@ -13,7 +13,7 @@ public interface IProprietaireService {
 
 
 
-    List<Proprietaire> getAllProprietaires();
+    List<ProprietaireDto> getAllProprietaires();
 
     Optional<Proprietaire> getProprietairetById(Long id);
 

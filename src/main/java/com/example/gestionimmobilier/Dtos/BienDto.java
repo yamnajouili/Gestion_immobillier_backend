@@ -15,6 +15,8 @@ public class BienDto {
     private TypeBien type;
     private String adresse;
     private String ville;
+    private Double latitude;
+    private Double longitude;
     private Boolean disponible;
     private List<ImageFileDto> images;
     private ProprietaireDto proprietaire;

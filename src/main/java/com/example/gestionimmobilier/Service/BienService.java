@@ -6,10 +6,8 @@ import com.example.gestionimmobilier.Entity.Client;
 import com.example.gestionimmobilier.Entity.ImageFile;
 import com.example.gestionimmobilier.Entity.Proprietaire;
 import com.example.gestionimmobilier.Mapper.IBienMapper;
-import com.example.gestionimmobilier.Repository.BienRepository;
-import com.example.gestionimmobilier.Repository.ClientRepository;
-import com.example.gestionimmobilier.Repository.ImageFileRepository;
-import com.example.gestionimmobilier.Repository.ProprietaireRepository;
+import com.example.gestionimmobilier.Repository.*;
+import com.example.gestionimmobilier.handler.BienHasContratException;
 import com.example.gestionimmobilier.storage.StorageService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AllArgsConstructor
 public class BienService implements IBienService{
     private final BienRepository bienRepository;
+    private final ContratRepository contratRepository;
     private final IBienMapper iBienMapper;
     private final StorageService storageService;
     private final ImageFileRepository imageFileRepository;
@@ -69,6 +68,8 @@ public class BienService implements IBienService{
                     .type(request.getType())
                     .adresse(request.getAdresse())
                     .ville(request.getVille())
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
                     .disponible(request.getDisponible())
                     .proprietaire(proprietaire) // 🔥 LIAISON IMPORTANTE
                     .build();
@@ -146,7 +147,10 @@ public class BienService implements IBienService{
         bien.setType(bienDto.getType());
         bien.setAdresse(bienDto.getAdresse());
         bien.setVille(bienDto.getVille());
+        bien.setLatitude(bienDto.getLatitude());
+        bien.setLongitude(bienDto.getLongitude());
         bien.setDisponible(bienDto.getDisponible());
+
 
         return bienRepository.save(bien);
     }
@@ -155,9 +159,15 @@ public class BienService implements IBienService{
     public void deleteBien(Long id) {
 
         if (!bienRepository.existsById(id)) {
-            throw new RuntimeException("Bien non trouvé");
+            throw new RuntimeException("Bien introuvable");
         }
-        bienRepository.deleteById(id);
 
+        if (contratRepository.existsByBienId(id)) {
+            throw new BienHasContratException(
+                    "Impossible de supprimer ce bien car il est associé à un contrat."
+            );
+        }
+
+        bienRepository.deleteById(id);
     }
 }

@@ -18,4 +18,6 @@ public interface ContratRepository extends JpaRepository<Contrat,Long> {
     List<Contrat> findByClientId(Long clientId);
     List<Contrat> findByClientEmail(String email);
     List<Contrat> findByProprietaireEmail(String email);
+    boolean existsByBienId(Long bienId);
+
 }

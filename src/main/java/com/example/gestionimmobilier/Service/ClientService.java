@@ -3,7 +3,7 @@ package com.example.gestionimmobilier.Service;
 import com.example.gestionimmobilier.Dtos.ClientDto;
 import com.example.gestionimmobilier.Entity.Client;
 
-import com.example.gestionimmobilier.Entity.Favoris;
+
 import com.example.gestionimmobilier.Entity.Token;
 import com.example.gestionimmobilier.Entity.User;
 import com.example.gestionimmobilier.Enum.Role;
@@ -32,11 +32,16 @@ public class ClientService implements IClientService{
     private final FavorisRepository favorisRepository;
     private final IClientMapper iClientMapper;
     @Override
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public List<ClientDto> getAllClients() {
+
+        List<Client> clients = clientRepository.findAll();
+
+        System.out.println("Nombre de clients = " + clients.size());
+
+        return clients.stream()
+                .map(iClientMapper::fromClient)
+                .toList();
     }
-
-
 
     public AuthenticationResponse register(ClientDto request) {
         if (clientRepository.findByEmail(request.getEmail()).isPresent()) {

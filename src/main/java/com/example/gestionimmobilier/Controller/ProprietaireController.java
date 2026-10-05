@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Tag(name = "Proprietaire", description = "CRUD Proprietaire")
 
@@ -18,6 +20,20 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class ProprietaireController {
     private IProprietaireService iProprietaireService;
+
+
+
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ProprietaireDto>> getAllProprietaires() {
+
+        return ResponseEntity.ok(
+                iProprietaireService.getAllProprietaires()
+        );
+    }
+
+
+
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody ProprietaireDto request) {
@@ -42,5 +58,14 @@ public class ProprietaireController {
         return ResponseEntity.ok(
                 iProprietaireService.getProprietaireById(id)
         );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProprietaire(
+            @PathVariable Long id) {
+
+        iProprietaireService.deleteProprietaire(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

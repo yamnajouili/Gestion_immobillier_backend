@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,6 +33,7 @@ public class UserController {
     public ResponseEntity<Map<String, String>> changePassword(
             @RequestBody ChangePasswordRequest request,
             Principal connectedUser
+
     ) {
 
         iUserService.changePassword(
@@ -48,4 +50,37 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+
+        return ResponseEntity.ok(
+                iUserService.getAllUsers()
+        );
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id
+    ) {
+
+        iUserService.deleteUser(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
+
+

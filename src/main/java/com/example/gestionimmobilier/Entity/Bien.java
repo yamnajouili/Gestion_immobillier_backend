@@ -28,6 +28,8 @@ public class Bien {
     private TypeBien type;
     private String adresse;
     private String ville;
+    private Double latitude;
+    private Double longitude;
     private Boolean disponible;
     private TypeTransaction typeTransaction;
     @ManyToOne

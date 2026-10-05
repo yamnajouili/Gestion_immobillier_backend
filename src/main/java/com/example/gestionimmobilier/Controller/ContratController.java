@@ -27,9 +27,16 @@ public class ContratController {
     // ✅ CREATE + envoi email
     @PostMapping("/add")
     @Operation(summary = "Créer un contrat et envoyer email au client")
-    public ResponseEntity<Contrat> createContrat(@RequestBody ContratDto request) throws Exception {
-        Contrat contrat = iContratService.createContrat(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(contrat);
+    public ResponseEntity<ContratDto> createContrat(
+            @RequestBody ContratDto request
+    ) {
+
+        ContratDto contrat =
+                iContratService.createContrat(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(contrat);
     }
 
     // ✅ READ ALL

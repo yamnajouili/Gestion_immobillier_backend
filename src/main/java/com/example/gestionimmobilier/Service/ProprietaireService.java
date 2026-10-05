@@ -8,11 +8,13 @@ import com.example.gestionimmobilier.Entity.User;
 import com.example.gestionimmobilier.Enum.Role;
 import com.example.gestionimmobilier.Enum.TokenType;
 import com.example.gestionimmobilier.Mapper.IProprietaireMapper;
+import com.example.gestionimmobilier.Repository.BienRepository;
 import com.example.gestionimmobilier.Repository.ClientRepository;
 import com.example.gestionimmobilier.Repository.ProprietaireRepository;
 import com.example.gestionimmobilier.Repository.TokenRepository;
 import com.example.gestionimmobilier.Security.JwtService;
 import com.example.gestionimmobilier.auth.AuthenticationResponse;
+import com.example.gestionimmobilier.handler.ProprietaireHasBiensException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +27,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProprietaireService implements IProprietaireService{
     private ProprietaireRepository proprietaireRepository;
+    private BienRepository bienRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
@@ -32,8 +35,12 @@ public class ProprietaireService implements IProprietaireService{
 
 
     @Override
-    public List<Proprietaire> getAllProprietaires() {
-        return proprietaireRepository.findAll();
+    public List<ProprietaireDto> getAllProprietaires() {
+
+        return proprietaireRepository.findAll()
+                .stream()
+                .map(iProprietaireMapper::fromProprietaire)
+                .toList();
     }
 
     @Override
@@ -154,5 +161,16 @@ public class ProprietaireService implements IProprietaireService{
     @Override
     public void deleteProprietaire(Long id) {
 
+        if (!proprietaireRepository.existsById(id)) {
+            throw new RuntimeException("Propriétaire introuvable");
+        }
+
+        if (bienRepository.existsByProprietaireId(id)) {
+            throw new ProprietaireHasBiensException(
+                    "Impossible de supprimer ce propriétaire car il possède encore des biens."
+            );
+        }
+
+        proprietaireRepository.deleteById(id);
     }
 }

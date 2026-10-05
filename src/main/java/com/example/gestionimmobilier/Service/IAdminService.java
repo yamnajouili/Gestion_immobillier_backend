@@ -14,4 +14,6 @@ public interface IAdminService {
     Admin saveAdmin(Admin admin);
 
     void deleteAdmin(Long id);
+
+    AdminDto updateProfile(AdminDto adminDto);
 }

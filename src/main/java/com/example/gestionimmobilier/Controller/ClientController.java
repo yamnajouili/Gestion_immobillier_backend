@@ -27,8 +27,11 @@ public class ClientController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<Client>> getAllClients() {
-        return ResponseEntity.ok(iClientService.getAllClients());
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+
+        return ResponseEntity.ok(
+                iClientService.getAllClients()
+        );
     }
 
     @PutMapping("/profile")
@@ -38,5 +41,13 @@ public class ClientController {
         return ResponseEntity.ok(
                 iClientService.updateProfile(clientDto)
         );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+
+        iClientService.deleteClient(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

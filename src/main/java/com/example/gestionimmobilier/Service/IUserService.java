@@ -16,5 +16,6 @@ public interface IUserService {
     UserDto getLoggedInUser();
     void changePassword(ChangePasswordRequest request, Principal connectedUser);
 
+    void deleteUser(Long id);
 
 }

@@ -13,4 +13,6 @@ public interface BienRepository extends JpaRepository<Bien,Long> {
 
     List<Bien> findByProprietaireEmail(String email);
     List<Bien> findByDisponibleTrue();
+    boolean existsByProprietaireId(Long proprietaireId);
+
 }
