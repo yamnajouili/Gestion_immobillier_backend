@@ -13,8 +13,8 @@ public enum BusinessErrorCodes {
     ACCOUNT_DISABLED(303, FORBIDDEN, "User account is disabled"),
     BAD_CREDENTIALS(304, FORBIDDEN, "Login and / or Password is incorrect"),
     PROPRIETAIRE_HAS_BIENS(305, BAD_REQUEST, "Impossible de supprimer ce propriétaire car il possède encore des biens"),
-    BIEN_HAS_CONTRAT(306, BAD_REQUEST, "Impossible de supprimer ce bien car il est associé à un contrat"
-    ),
+    BIEN_HAS_CONTRAT(306, BAD_REQUEST, "Impossible de supprimer ce bien car il est associé à un contrat"),
+    USER_HAS_DEPENDENCIES(307, BAD_REQUEST, "Impossible de supprimer cet utilisateur car il possède des données associées"),
     ;
 
     @Getter

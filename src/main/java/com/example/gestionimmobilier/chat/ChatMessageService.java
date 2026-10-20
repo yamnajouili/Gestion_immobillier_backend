@@ -84,20 +84,16 @@ public class ChatMessageService {
     // RÉCUPÉRER LES CONTACTS
     // =========================================================
 
+
     public List<ContactDTO> getContacts(Long userId) {
 
-        // 1. Récupérer tous les messages de l'utilisateur
+        // 1. Récupérer les messages de l'utilisateur
         List<ChatMessage> messages =
                 repository.findAllByUserId(userId);
 
-        /*
-         * Map :
-         * clé   = id du contact
-         * valeur = dernier message avec ce contact
-         */
+        // Dernier message pour chaque contact
         Map<Long, ChatMessage> lastMessageByContact =
                 new LinkedHashMap<>();
-
 
         // 2. Identifier les contacts
         for (ChatMessage message : messages) {
@@ -105,45 +101,27 @@ public class ChatMessageService {
             Long contactId;
 
             if (message.getSenderId().equals(userId)) {
-
-                // L'utilisateur connecté est l'expéditeur
                 contactId = message.getRecipientId();
-
             } else {
-
-                // L'utilisateur connecté est le destinataire
                 contactId = message.getSenderId();
             }
 
-
-            /*
-             * Les messages sont déjà triés DESC.
-             *
-             * Donc le premier message rencontré
-             * pour un contact est son dernier message.
-             */
+            // Les messages sont déjà triés DESC
             if (!lastMessageByContact.containsKey(contactId)) {
-
-                lastMessageByContact.put(
-                        contactId,
-                        message
-                );
+                lastMessageByContact.put(contactId, message);
             }
         }
 
-
-        // 3. Construire les ContactDTO
+        // 3. Construire la liste des contacts
         List<ContactDTO> contacts = new ArrayList<>();
 
         for (Map.Entry<Long, ChatMessage> entry :
                 lastMessageByContact.entrySet()) {
 
             Long contactId = entry.getKey();
-
             ChatMessage lastMessage = entry.getValue();
 
-
-            // 4. Récupérer l'utilisateur correspondant
+            // 4. Récupérer l'utilisateur
             Optional<User> userOptional =
                     userRepository.findById(contactId);
 
@@ -153,35 +131,24 @@ public class ChatMessageService {
 
             User user = userOptional.get();
 
-
             // 5. Construire le DTO
             ContactDTO contact = new ContactDTO();
 
             contact.setId(user.getId());
 
-            /*
-             * IMPORTANT :
-             * adapte getName() selon ton User.
-             */
             contact.setName(user.getNom());
 
-            contact.setLastMessage(
-                    lastMessage.getContent()
-            );
+            // Photo de profil du contact
+            contact.setImage(user.getPhotoProfil());
 
-            contact.setLastMessageTime(
-                    lastMessage.getTimestamp()
-            );
+            // Dernier message
+            contact.setLastMessage(lastMessage.getContent());
 
-            /*
-             * Pour l'instant, valeurs par défaut.
-             * On pourra ensuite récupérer ces informations
-             * depuis User.
-             */
+            // Date du dernier message
+            contact.setLastMessageTime(lastMessage.getTimestamp());
+
+            // Statut par défaut
             contact.setStatus("offline");
-
-            contact.setImage(null);
-
 
             contacts.add(contact);
         }

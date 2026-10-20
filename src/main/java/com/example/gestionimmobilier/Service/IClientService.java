@@ -16,7 +16,7 @@ public interface IClientService {
 
 
     List<ClientDto> getAllClients();
-    Optional<Client> getClientById(Long id);
+    Optional<ClientDto> getClientById(Long id);
 
     AuthenticationResponse register(ClientDto request);
 

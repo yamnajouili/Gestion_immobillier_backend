@@ -14,7 +14,9 @@ import com.example.gestionimmobilier.Repository.FavorisRepository;
 import com.example.gestionimmobilier.Repository.TokenRepository;
 import com.example.gestionimmobilier.Security.JwtService;
 import com.example.gestionimmobilier.auth.AuthenticationResponse;
+import com.example.gestionimmobilier.handler.UserHasDependenciesException;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,6 @@ public class ClientService implements IClientService{
 
         List<Client> clients = clientRepository.findAll();
 
-        System.out.println("Nombre de clients = " + clients.size());
 
         return clients.stream()
                 .map(iClientMapper::fromClient)
@@ -106,14 +107,28 @@ public class ClientService implements IClientService{
 
 
     @Override
-    public Optional<Client> getClientById(Long id) {
-        return clientRepository.findById(id);
+    public Optional<ClientDto> getClientById(Long id) {
+        return clientRepository.findById(id)
+                .map(client -> iClientMapper.fromClient(client));
     }
 
     @Override
     public void deleteClient(Long id) {
-        clientRepository.deleteById(id);
 
+        if (!clientRepository.existsById(id)) {
+            throw new RuntimeException("Client introuvable");
+        }
+
+        try {
+            clientRepository.deleteById(id);
+            clientRepository.flush();
+
+        } catch (DataIntegrityViolationException e) {
+
+            throw new UserHasDependenciesException(
+                    "Impossible de supprimer ce client car il possède des données associées."
+            );
+        }
     }
 
 

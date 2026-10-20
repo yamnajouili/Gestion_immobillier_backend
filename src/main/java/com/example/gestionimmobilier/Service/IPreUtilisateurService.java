@@ -1,8 +1,6 @@
 package com.example.gestionimmobilier.Service;
 
-import com.example.gestionimmobilier.Dtos.BienDto;
 import com.example.gestionimmobilier.Dtos.PreferenceUtilisateurDto;
-import com.example.gestionimmobilier.Entity.Bien;
 import com.example.gestionimmobilier.Entity.PreferenceUtilisateur;
 import org.springframework.transaction.annotation.Transactional;
 

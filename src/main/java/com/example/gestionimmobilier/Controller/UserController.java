@@ -2,6 +2,7 @@ package com.example.gestionimmobilier.Controller;
 
 
 import com.example.gestionimmobilier.Dtos.ChangePasswordRequest;
+import com.example.gestionimmobilier.Dtos.UserDetailDto;
 import com.example.gestionimmobilier.Dtos.UserDto;
 import com.example.gestionimmobilier.Service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,16 +63,17 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
 
         iUserService.deleteUser(id);
 
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDetailDto> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(iUserService.getUserDetailById(id));
+    }
 
 
 

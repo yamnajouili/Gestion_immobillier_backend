@@ -161,4 +161,29 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+
+
+
+
+    @ExceptionHandler(UserHasDependenciesException.class)
+    public ResponseEntity<ExceptionResponse> handleUserHasDependenciesException(
+            UserHasDependenciesException exp) {
+
+        BusinessErrorCodes errorCode =
+                BusinessErrorCodes.USER_HAS_DEPENDENCIES;
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ExceptionResponse.builder()
+                                .businessErrorCode(errorCode.getCode())
+                                .businessErrorDescription(errorCode.getDescription())
+                                .error(exp.getMessage())
+                                .build()
+                );
+    }
+
+
+
 }

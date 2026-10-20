@@ -1,6 +1,7 @@
 package com.example.gestionimmobilier.Mapper;
 
 
+import com.example.gestionimmobilier.Dtos.UserDetailDto;
 import com.example.gestionimmobilier.Dtos.UserDto;
 import com.example.gestionimmobilier.Entity.User;
 import lombok.AllArgsConstructor;
@@ -19,5 +20,10 @@ public class UserMapper implements IUserMapper{
     @Override
     public User fromUserDTO(UserDto userDto) {
         return modelMapper.map(userDto, User.class);
+    }
+
+    @Override
+    public UserDetailDto fromUserDetail(User user) {
+        return modelMapper.map(user, UserDetailDto.class);
     }
 }

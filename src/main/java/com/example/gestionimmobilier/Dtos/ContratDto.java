@@ -20,4 +20,5 @@ public class ContratDto {
     private String clientEmail;
     private Long proprietaireId;
     private String nomProprietaire;
+    private String telephoneProprietaire;
 }

@@ -1,11 +1,14 @@
 package com.example.gestionimmobilier.Service;
 
 import com.example.gestionimmobilier.Dtos.ChangePasswordRequest;
+import com.example.gestionimmobilier.Dtos.UserDetailDto;
 import com.example.gestionimmobilier.Dtos.UserDto;
 import com.example.gestionimmobilier.Entity.User;
 import com.example.gestionimmobilier.Mapper.IUserMapper;
 import com.example.gestionimmobilier.Repository.UserRepository;
+import com.example.gestionimmobilier.handler.UserHasDependenciesException;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,18 +93,41 @@ public class UserService implements IUserService {
         userRepository.save(user);
     }
 
+    @Override
+    public Optional<UserDto> getUserById(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public UserDetailDto getUserDetailById(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Utilisateur introuvable")
+                );
+
+        return iUserMapper.fromUserDetail(user);
+    }
 
 
     @Override
     public void deleteUser(Long id) {
 
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException(
-                    "Utilisateur non trouvé"
-            );
+            throw new RuntimeException("Utilisateur introuvable");
         }
 
-        userRepository.deleteById(id);
+        try {
+
+            userRepository.deleteById(id);
+            userRepository.flush();
+
+        } catch (DataIntegrityViolationException e) {
+
+            throw new UserHasDependenciesException(
+                    "Impossible de supprimer cet utilisateur car il possède des données associées."
+            );
+        }
     }
 
 }

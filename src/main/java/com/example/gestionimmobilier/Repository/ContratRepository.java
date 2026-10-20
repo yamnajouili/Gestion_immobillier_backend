@@ -1,6 +1,7 @@
 package com.example.gestionimmobilier.Repository;
 
 import com.example.gestionimmobilier.Entity.Contrat;
+import com.example.gestionimmobilier.Enum.StatutContrat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +20,6 @@ public interface ContratRepository extends JpaRepository<Contrat,Long> {
     List<Contrat> findByClientEmail(String email);
     List<Contrat> findByProprietaireEmail(String email);
     boolean existsByBienId(Long bienId);
+    List<Contrat> findByStatut(StatutContrat statut);
 
 }

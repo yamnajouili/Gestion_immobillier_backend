@@ -50,4 +50,11 @@ public class ClientController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientDto> getClientById(@PathVariable Long id) {
+        return iClientService.getClientById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

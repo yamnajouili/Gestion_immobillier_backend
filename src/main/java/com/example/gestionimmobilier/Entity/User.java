@@ -5,10 +5,12 @@ import com.example.gestionimmobilier.Enum.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 
 
 @Entity
@@ -31,6 +33,13 @@ public class User implements UserDetails, Serializable {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Column(name = "photo_profil")
+    private String photoProfil;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(updatable = false)
+    private Date creationDate;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

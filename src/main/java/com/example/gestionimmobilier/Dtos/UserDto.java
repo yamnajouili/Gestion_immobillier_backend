@@ -4,6 +4,7 @@ import com.example.gestionimmobilier.Enum.Role;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,6 +17,8 @@ public class UserDto {
         private String email;
         private String password;
         private Role role;
+        private Date creationDate;
+        private String photoProfil;
 
 
 

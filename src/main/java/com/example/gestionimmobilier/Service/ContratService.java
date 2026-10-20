@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import org.springframework.scheduling.annotation.Scheduled;
+import java.util.Date;
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -332,4 +333,43 @@ public class ContratService implements IContratService {
                 .map(iContratMapper::fromContrat)
                 .toList();
     }
+
+
+
+
+
+    @Scheduled(fixedRate = 60000)
+    public void terminerContratsExpires() {
+
+        List<Contrat> contratsEnCours =
+                contratRepository.findByStatut(StatutContrat.EN_COURS);
+
+        Date maintenant = new Date();
+
+        for (Contrat contrat : contratsEnCours) {
+
+            if (contrat.getDateFin() != null
+                    && contrat.getDateFin().before(maintenant)) {
+
+                // Contrat terminé
+                contrat.setStatut(StatutContrat.TERMINE);
+
+                // Le bien redevient disponible
+                Bien bien = contrat.getBien();
+
+                if (bien != null) {
+                    bien.setDisponible(true);
+                    bienRepository.save(bien);
+                }
+
+                contratRepository.save(contrat);
+
+                log.info(
+                        "Contrat {} terminé automatiquement",
+                        contrat.getId()
+                );
+            }
+        }
+    }
+
 }

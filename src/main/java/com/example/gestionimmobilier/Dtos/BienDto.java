@@ -1,5 +1,6 @@
 package com.example.gestionimmobilier.Dtos;
 import com.example.gestionimmobilier.Enum.TypeBien;
+import com.example.gestionimmobilier.Enum.TypeTransaction;
 import lombok.Data;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class BienDto {
     private TypeBien type;
     private String adresse;
     private String ville;
+    private TypeTransaction typeTransaction;
     private Double latitude;
     private Double longitude;
     private Boolean disponible;

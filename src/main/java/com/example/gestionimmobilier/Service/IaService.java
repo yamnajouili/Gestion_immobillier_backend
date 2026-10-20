@@ -101,6 +101,7 @@ public class IaService {
         dto.setPrix(bien.getPrix());
         dto.setSurface(bien.getSurface());
         dto.setVille(bien.getVille());
+        dto.setTypeTransaction(bien.getTypeTransaction());
         dto.setTypeBien(bien.getType());
 
         return dto;
